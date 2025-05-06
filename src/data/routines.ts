@@ -1,4 +1,3 @@
-
 import { Routine } from "../types";
 
 export const routines: Routine[] = [
@@ -14,7 +13,18 @@ export const routines: Routine[] = [
     duration: "3 breath cycles (~1 min)",
     science: "Activates parasympathetic state, stabilizes HRV, improves cognitive performance under pressure",
     iconName: "target",
-    tags: ["focus", "clarity", "calm"]
+    tags: ["focus", "clarity", "calm"],
+    detailedInstructions: [
+      { text: "Sit up straight and prepare to focus", durationSeconds: 5 },
+      { text: "Inhale deeply for 4 seconds", durationSeconds: 4 },
+      { text: "Hold your breath for 2 seconds", durationSeconds: 2 },
+      { text: "Exhale slowly for 8 seconds", durationSeconds: 8 },
+      { text: "Relax your shoulders, jaw, and hands", durationSeconds: 3 },
+      { text: "Repeat the breathing cycle", durationSeconds: 14 },
+      { text: "Focus your eyes on one point ahead", durationSeconds: 5 },
+      { text: "Complete the final breath cycle", durationSeconds: 14 },
+      { text: "Notice your improved mental clarity", durationSeconds: 5 }
+    ]
   },
   {
     id: "inner-sprint",
@@ -29,7 +39,18 @@ export const routines: Routine[] = [
     duration: "1 min",
     science: "Mental imagery + somatic activation triggers dopamine and primes neural readiness (Guillot & Collet, 2008)",
     iconName: "zap",
-    tags: ["energy", "focus", "performance"]
+    tags: ["energy", "focus", "performance"],
+    detailedInstructions: [
+      { text: "Take a deep breath to prepare", durationSeconds: 5 },
+      { text: "Close your eyes and clench your fists", durationSeconds: 5 },
+      { text: "Visualize yourself dominating a key moment", durationSeconds: 15 },
+      { text: "Focus on the details - sights, sounds, feelings", durationSeconds: 10 },
+      { text: "Visualize reaching the peak moment", durationSeconds: 5 },
+      { text: "Hold your breath for 3 seconds at the peak", durationSeconds: 3 },
+      { text: "Exhale sharply with force", durationSeconds: 2 },
+      { text: "Open your eyes and sit/stand tall", durationSeconds: 5 },
+      { text: "Feel the energy and readiness flowing through you", durationSeconds: 10 }
+    ]
   },
   {
     id: "micro-win",
@@ -43,7 +64,18 @@ export const routines: Routine[] = [
     duration: "30 seconds",
     science: "Celebratory gesture increases reward circuitry activation (BJ Fogg, 2019)",
     iconName: "award",
-    tags: ["confidence", "positivity"]
+    tags: ["confidence", "positivity"],
+    detailedInstructions: [
+      { text: "Think about your day so far", durationSeconds: 5 },
+      { text: "Identify one small thing you did well today", durationSeconds: 10 },
+      { text: "Focus on this achievement, however small", durationSeconds: 5 },
+      { text: "Smile wide and feel genuine pride", durationSeconds: 3 },
+      { text: "Raise your arms overhead in celebration", durationSeconds: 3 },
+      { text: "Say out loud: 'I stack wins!'", durationSeconds: 2 },
+      { text: "Hold this feeling of accomplishment", durationSeconds: 5 },
+      { text: "Lower your arms and continue smiling", durationSeconds: 2 },
+      { text: "Notice the boost in your confidence", durationSeconds: 5 }
+    ]
   },
   {
     id: "jaw-unlock",
@@ -57,7 +89,18 @@ export const routines: Routine[] = [
     duration: "45 seconds",
     science: "Unblocks facial-muscle-induced limbic tension, backed by TMJ-relaxation studies (Fujisawa, 2012)",
     iconName: "smile",
-    tags: ["relaxation", "tension-release"]
+    tags: ["relaxation", "tension-release"],
+    detailedInstructions: [
+      { text: "Sit comfortably and take a deep breath", durationSeconds: 5 },
+      { text: "Place your tongue on the roof of your mouth", durationSeconds: 3 },
+      { text: "Slowly clench your jaw", durationSeconds: 2 },
+      { text: "Now unclench and relax", durationSeconds: 2 },
+      { text: "Repeat the clench and release 2 more times", durationSeconds: 8 },
+      { text: "Find your masseter muscle (side of jaw)", durationSeconds: 3 },
+      { text: "Massage the right side with your thumb", durationSeconds: 10 },
+      { text: "Now massage the left side with your thumb", durationSeconds: 10 },
+      { text: "Notice the release of tension in your face", durationSeconds: 5 }
+    ]
   },
   {
     id: "cold-mind",

@@ -8,6 +8,12 @@ export interface Routine {
   science: string;
   iconName: string;
   tags: string[];
+  detailedInstructions?: InstructionStep[];
+}
+
+export interface InstructionStep {
+  text: string;
+  durationSeconds: number;
 }
 
 export interface QuizState {
@@ -30,4 +36,11 @@ export interface QuizState {
 export interface ApiKeyState {
   openAiKey: string;
   keyValidated: boolean;
+}
+
+export interface RoutineFeedback {
+  routineId: string;
+  rating: number;
+  comment?: string;
+  timestamp: Date;
 }
