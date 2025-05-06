@@ -4,44 +4,68 @@ import { routines } from "../data/routines";
 
 export function determineRoutine(state: QuizState): string {
   // First, check for specific conditions that lead to clear recommendations
+  
+  // Cold Exposure First
   if (state.wantColdExposure) {
     return "cold-mind";
   }
   
+  // Physical Relaxation Priority
   if (state.needPhysicalRelaxation >= 7) {
     return "jaw-unlock";
   }
   
-  if (state.stressLevel >= 8 && state.needEmotionalRegulation) {
-    return "focus-injector";
+  // Stress + Focus Combo
+  if (state.stressLevel >= 7 && state.needFocus) {
+    if (state.mentalClarity <= 5) {
+      return "precision-reset";
+    } else {
+      return "focus-injector"; // Physiological Sigh + Eye Lock
+    }
   }
   
-  if (state.needVisualization && state.needPhysicalActivation) {
-    return "inner-sprint";
+  // Emotional Regulation
+  if (state.needEmotionalRegulation) {
+    if (state.stressLevel >= 5) {
+      return "dichotomy-cut"; // Stoic reframe
+    }
+    if (state.energyLevel <= 5) {
+      return "micro-win"; // Celebration
+    }
+    return "sutra-selector"; // AI mantra
   }
   
-  if (state.needFocus && state.stressLevel <= 5) {
-    return "precision-reset";
+  // Energy/Activation Needs
+  if (state.needPhysicalActivation || state.energyLevel <= 3) {
+    if (state.needVisualization) {
+      return "inner-sprint"; // Visualization
+    } else {
+      return "micro-win"; // Quick energy boost
+    }
   }
   
-  if (state.mentalClarity <= 4 && state.energyLevel <= 4) {
-    return "sutra-selector";
-  }
-  
-  if (state.needEmotionalRegulation && !state.needPhysicalActivation) {
-    return "dichotomy-cut";
-  }
-  
-  if (state.needDistractionControl && state.mentalClarity <= 5) {
+  // Distraction Control
+  if (state.needDistractionControl) {
     return "strike-clarity";
   }
   
-  if (state.energyLevel <= 3) {
-    return "micro-win";
+  // Visualization Preference
+  if (state.needVisualization) {
+    if (state.needEmotionalRegulation) {
+      return "emotional-mask"; // Add this to routines
+    }
+    if (state.needFocus) {
+      return "strike-clarity";
+    }
   }
   
-  // Default to precision reset if no clear match
-  return "precision-reset";
+  // Deep Practice Preference
+  if (state.preferQuickRoutine <= 3) { // Inverted scale - lower means deeper practice
+    return "nothingness-reset"; // Add this to routines
+  }
+  
+  // Default
+  return "sutra-selector";
 }
 
 export function getRoutineById(id: string) {

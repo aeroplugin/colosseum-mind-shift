@@ -142,5 +142,19 @@ export const routines: Routine[] = [
     science: "Inspired by Sun Tzu — \"Victorious warriors win first and then go to war.\"",
     iconName: "target",
     tags: ["clarity", "preparation", "confidence"]
+  },
+  {
+    id: "nothingness-reset",
+    name: "Nothingness Reset",
+    purpose: "Clear mental clutter and find clarity in stillness",
+    steps: [
+      "Set timer for 60 seconds and close your eyes",
+      "Focus on the emptiness of your mind",
+      "When the timer ends, note what truth emerged in stillness"
+    ],
+    duration: "1 min",
+    science: "Zen meditation practices shown to reduce default mode network activity and boost creativity",
+    iconName: "moon",
+    tags: ["meditation", "clarity", "stillness"]
   }
 ];
