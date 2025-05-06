@@ -11,7 +11,7 @@ const Library = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const { resetQuiz } = useAppContext();
+  const { resetQuiz, setRecommendedRoutine } = useAppContext();
 
   // Get unique tags from all routines
   const tags = Array.from(
@@ -32,7 +32,8 @@ const Library = () => {
   const handleRoutineStart = (routineId: string) => {
     const routine = routines.find(r => r.id === routineId);
     if (routine) {
-      resetQuiz();
+      // Set the selected routine in the context before navigating
+      setRecommendedRoutine(routine);
       navigate("/routine");
     }
   };

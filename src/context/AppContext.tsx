@@ -11,6 +11,7 @@ interface AppContextType {
   
   // Routine state
   recommendedRoutine: Routine | null;
+  setRecommendedRoutine: (routine: Routine) => void;
   getRecommendation: () => void;
   
   // API key state
@@ -84,6 +85,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateQuizState,
         resetQuiz,
         recommendedRoutine,
+        setRecommendedRoutine,
         getRecommendation,
         apiKeyState,
         updateApiKey,
