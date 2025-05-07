@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { routines } from "@/data/routines";
 import RoutineCard from "@/components/RoutineCard";
 import { useAppContext } from "@/context/AppContext";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, Settings } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const Library = () => {
@@ -52,14 +52,23 @@ const Library = () => {
 
   return (
     <div className="min-h-screen bg-[#121212] text-[#F5F5F5] p-6">
-      <div className="flex items-center mb-6">
-        <button 
-          onClick={handleBackClick}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <button 
+            onClick={handleBackClick}
+            className="text-[#D8C5A3] hover:text-[#F5F5F5] transition-colors"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-2xl font-trajan uppercase tracking-wide ml-4">Routine Library</h1>
+        </div>
+        <button
+          onClick={() => navigate("/settings")}
           className="text-[#D8C5A3] hover:text-[#F5F5F5] transition-colors"
+          aria-label="Settings"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <Settings className="w-6 h-6" />
         </button>
-        <h1 className="text-2xl font-trajan uppercase tracking-wide ml-4">Routine Library</h1>
       </div>
 
       <div className="mb-6">

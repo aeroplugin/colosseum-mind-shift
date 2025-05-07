@@ -1,0 +1,45 @@
+
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AppProvider } from './context/AppContext';
+
+// Import screens
+import HomeScreen from './screens/HomeScreen';
+import QuizScreen from './screens/QuizScreen';
+import LibraryScreen from './screens/LibraryScreen';
+import RoutineScreen from './screens/RoutineScreen';
+import SettingsScreen from './screens/SettingsScreen';
+
+const Stack = createStackNavigator();
+const queryClient = new QueryClient();
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppProvider>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <Stack.Navigator 
+              initialRouteName="Home"
+              screenOptions={{
+                headerShown: false,
+                cardStyle: { backgroundColor: '#121212' }
+              }}
+            >
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Quiz" component={QuizScreen} />
+              <Stack.Screen name="Library" component={LibraryScreen} />
+              <Stack.Screen name="Routine" component={RoutineScreen} />
+              <Stack.Screen name="Settings" component={SettingsScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </AppProvider>
+    </QueryClientProvider>
+  );
+};
+
+export default App;

@@ -1,16 +1,25 @@
 
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "@/components/ui/PrimaryButton";
-import { Brain, Library } from "lucide-react";
+import { Brain, Library, Settings } from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#121212] text-[#F5F5F5] p-6 flex flex-col">
-      <header className="mb-8">
-        <h1 className="text-3xl font-trajan uppercase tracking-wide text-[#D8C5A3]">Colosseum Mind</h1>
-        <p className="text-[#B3B3B3] mt-2">Science-backed 1-minute mental routines</p>
+      <header className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-trajan uppercase tracking-wide text-[#D8C5A3]">Colosseum Mind</h1>
+          <p className="text-[#B3B3B3] mt-2">Science-backed 1-minute mental routines</p>
+        </div>
+        <button
+          onClick={() => navigate("/settings")}
+          className="text-[#D8C5A3] hover:text-[#F5F5F5] transition-colors"
+          aria-label="Settings"
+        >
+          <Settings className="w-6 h-6" />
+        </button>
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center text-center">
