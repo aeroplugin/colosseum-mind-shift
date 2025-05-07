@@ -32,6 +32,7 @@ const App = () => {
         <SafeAreaProvider>
           <NavigationContainer>
             <Stack.Navigator 
+              id="AppNavigator"
               initialRouteName="Home"
               screenOptions={{
                 headerShown: false,
