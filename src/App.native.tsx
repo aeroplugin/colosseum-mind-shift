@@ -13,7 +13,16 @@ import LibraryScreen from './screens/LibraryScreen';
 import RoutineScreen from './screens/RoutineScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
-const Stack = createStackNavigator();
+// Define types for the navigation stack
+export type RootStackParamList = {
+  Home: undefined;
+  Quiz: undefined;
+  Library: undefined;
+  Routine: { routineId: string };
+  Settings: undefined;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 const queryClient = new QueryClient();
 
 const App = () => {

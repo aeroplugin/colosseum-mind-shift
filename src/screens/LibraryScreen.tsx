@@ -2,6 +2,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../App.native';
+
+type LibraryScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Library'>;
 
 // Sample data - in a real app, this would come from context/API
 const routines = [
@@ -11,7 +15,7 @@ const routines = [
 ];
 
 const LibraryScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<LibraryScreenNavigationProp>();
 
   const renderRoutineItem = ({ item }) => (
     <TouchableOpacity 

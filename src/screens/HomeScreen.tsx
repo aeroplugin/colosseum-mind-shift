@@ -2,9 +2,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../App.native';
+
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 const HomeScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
   return (
     <SafeAreaView style={styles.container}>

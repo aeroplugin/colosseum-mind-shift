@@ -1,12 +1,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../App.native';
+
+type RoutineScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Routine'>;
+type RoutineScreenRouteProp = RouteProp<RootStackParamList, 'Routine'>;
 
 const RoutineScreen = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const routineId = route.params?.routineId || '1';
+  const navigation = useNavigation<RoutineScreenNavigationProp>();
+  const route = useRoute<RoutineScreenRouteProp>();
+  const { routineId } = route.params;
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
 
