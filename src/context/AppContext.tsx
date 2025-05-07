@@ -1,6 +1,5 @@
-
-import React, { createContext, useContext, useState } from "react";
-import { QuizState, ApiKeyState, Routine } from "../types";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { QuizState, ApiKeyState, Routine, AudioSettings, ElevenLabsVoice } from "../types";
 import { determineRoutine, getRoutineById } from "../utils/quizLogic";
 
 interface AppContextType {
@@ -16,8 +15,14 @@ interface AppContextType {
   
   // API key state
   apiKeyState: ApiKeyState;
-  updateApiKey: (key: string) => void;
-  validateApiKey: () => Promise<boolean>;
+  updateApiKey: (key: string, type: 'openai' | 'elevenlabs') => void;
+  validateApiKey: (type: 'openai' | 'elevenlabs') => Promise<boolean>;
+  
+  // Audio settings
+  audioSettings: AudioSettings;
+  updateAudioSettings: (updates: Partial<AudioSettings>) => void;
+  availableVoices: ElevenLabsVoice[];
+  fetchVoices: () => Promise<void>;
 }
 
 const defaultQuizState: QuizState = {
@@ -36,15 +41,51 @@ const defaultQuizState: QuizState = {
 
 const defaultApiKeyState: ApiKeyState = {
   openAiKey: "",
-  keyValidated: false
+  elevenLabsKey: "",
+  keyValidated: false,
+  elevenLabsKeyValidated: false
+};
+
+const defaultAudioSettings: AudioSettings = {
+  voiceoverEnabled: true,
+  ambienceEnabled: true,
+  selectedVoiceId: "",
+  ambienceStyle: "zen-rain",
+  volume: 0.8
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [quizState, setQuizState] = useState<QuizState>(defaultQuizState);
+  const [quizState, setQuizState] = useState<QuizState>(() => {
+    const saved = localStorage.getItem('quizState');
+    return saved ? JSON.parse(saved) : defaultQuizState;
+  });
+  
   const [recommendedRoutine, setRecommendedRoutine] = useState<Routine | null>(null);
-  const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(defaultApiKeyState);
+  const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(() => {
+    const saved = localStorage.getItem('apiKeyState');
+    return saved ? JSON.parse(saved) : defaultApiKeyState;
+  });
+  
+  const [audioSettings, setAudioSettings] = useState<AudioSettings>(() => {
+    const saved = localStorage.getItem('audioSettings');
+    return saved ? JSON.parse(saved) : defaultAudioSettings;
+  });
+  
+  const [availableVoices, setAvailableVoices] = useState<ElevenLabsVoice[]>([]);
+
+  useEffect(() => {
+    localStorage.setItem('quizState', JSON.stringify(quizState));
+  }, [quizState]);
+
+  useEffect(() => {
+    localStorage.setItem('apiKeyState', JSON.stringify(apiKeyState));
+  }, [apiKeyState]);
+
+  useEffect(() => {
+    localStorage.setItem('audioSettings', JSON.stringify(audioSettings));
+  }, [audioSettings]);
 
   const updateQuizState = (updates: Partial<QuizState>) => {
     setQuizState(prev => ({ ...prev, ...updates }));
@@ -61,20 +102,70 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRecommendedRoutine(routine);
   };
 
-  const updateApiKey = (key: string) => {
-    setApiKeyState(prev => ({ ...prev, openAiKey: key }));
+  const updateApiKey = (key: string, type: 'openai' | 'elevenlabs') => {
+    setApiKeyState(prev => ({
+      ...prev,
+      [type === 'openai' ? 'openAiKey' : 'elevenLabsKey']: key,
+      [type === 'openai' ? 'keyValidated' : 'elevenLabsKeyValidated']: false
+    }));
   };
 
-  const validateApiKey = async (): Promise<boolean> => {
+  const validateApiKey = async (type: 'openai' | 'elevenlabs'): Promise<boolean> => {
     try {
-      // Basic validation - in a real app, you'd make a test call to OpenAI API
-      const isValid = apiKeyState.openAiKey.startsWith("sk-") && apiKeyState.openAiKey.length > 20;
-      setApiKeyState(prev => ({ ...prev, keyValidated: isValid }));
-      return isValid;
+      if (type === 'openai') {
+        const isValid = apiKeyState.openAiKey.startsWith("sk-") && apiKeyState.openAiKey.length > 20;
+        setApiKeyState(prev => ({ ...prev, keyValidated: isValid }));
+        return isValid;
+      } else {
+        // Validate ElevenLabs key
+        const response = await fetch('https://api.elevenlabs.io/v1/voices', {
+          headers: {
+            'xi-api-key': apiKeyState.elevenLabsKey
+          }
+        });
+        
+        const isValid = response.ok;
+        setApiKeyState(prev => ({ ...prev, elevenLabsKeyValidated: isValid }));
+        
+        if (isValid) {
+          const data = await response.json();
+          setAvailableVoices(data.voices);
+        }
+        
+        return isValid;
+      }
     } catch (error) {
-      console.error("Error validating API key:", error);
-      setApiKeyState(prev => ({ ...prev, keyValidated: false }));
+      console.error(`Error validating ${type} API key:`, error);
+      setApiKeyState(prev => ({
+        ...prev,
+        [type === 'openai' ? 'keyValidated' : 'elevenLabsKeyValidated']: false
+      }));
       return false;
+    }
+  };
+
+  const updateAudioSettings = (updates: Partial<AudioSettings>) => {
+    setAudioSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  const fetchVoices = async () => {
+    if (!apiKeyState.elevenLabsKey || !apiKeyState.elevenLabsKeyValidated) {
+      return;
+    }
+
+    try {
+      const response = await fetch('https://api.elevenlabs.io/v1/voices', {
+        headers: {
+          'xi-api-key': apiKeyState.elevenLabsKey
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableVoices(data.voices);
+      }
+    } catch (error) {
+      console.error('Error fetching voices:', error);
     }
   };
 
@@ -89,7 +180,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         getRecommendation,
         apiKeyState,
         updateApiKey,
-        validateApiKey
+        validateApiKey,
+        audioSettings,
+        updateAudioSettings,
+        availableVoices,
+        fetchVoices
       }}
     >
       {children}

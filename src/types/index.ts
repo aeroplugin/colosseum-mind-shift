@@ -1,4 +1,3 @@
-
 export interface Routine {
   id: string;
   name: string;
@@ -35,7 +34,23 @@ export interface QuizState {
 
 export interface ApiKeyState {
   openAiKey: string;
+  elevenLabsKey: string;
   keyValidated: boolean;
+  elevenLabsKeyValidated: boolean;
+}
+
+export interface AudioSettings {
+  voiceoverEnabled: boolean;
+  ambienceEnabled: boolean;
+  selectedVoiceId: string;
+  ambienceStyle: "zen-rain" | "calm-ocean" | "none";
+  volume: number;
+}
+
+export interface ElevenLabsVoice {
+  voice_id: string;
+  name: string;
+  preview_url: string;
 }
 
 export interface RoutineFeedback {
