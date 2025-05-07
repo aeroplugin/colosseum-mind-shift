@@ -2,11 +2,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Routine, InstructionStep } from "@/types";
 import PrimaryButton from "@/components/ui/PrimaryButton";
-import { ArrowLeft, Pause, Play, SkipForward, ThumbsUp, ThumbsDown, Check } from "lucide-react";
+import { ArrowLeft, Pause, Play, SkipForward, ThumbsUp, ThumbsDown, Check, Volume2, VolumeX } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useAppContext } from "@/context/AppContext";
+import { audioService } from "@/services/audioService";
 
 interface RoutinePlayerProps {
   routine: Routine;
@@ -27,8 +29,11 @@ const RoutinePlayer: React.FC<RoutinePlayerProps> = ({
   const [showFeedback, setShowFeedback] = useState(false);
   const [rating, setRating] = useState(5);
   const [feedbackComment, setFeedbackComment] = useState("");
+  const [voiceoverUrl, setVoiceoverUrl] = useState<string | null>(null);
+  const [isAudioMuted, setIsAudioMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const navigate = useNavigate();
+  const { apiKeyState, audioSettings } = useAppContext();
 
   // Get detailed instructions or create default ones from steps
   const detailedInstructions = routine.detailedInstructions || 
@@ -41,6 +46,40 @@ const RoutinePlayer: React.FC<RoutinePlayerProps> = ({
   const totalDuration = detailedInstructions.reduce(
     (sum, step) => sum + step.durationSeconds, 0
   );
+
+  useEffect(() => {
+    // Generate voiceover if ElevenLabs API key is available and voice is selected
+    const generateVoiceover = async () => {
+      if (
+        apiKeyState.elevenLabsKeyValidated && 
+        audioSettings.voiceoverEnabled && 
+        audioSettings.selectedVoiceId
+      ) {
+        try {
+          // Create a script from the routine instructions
+          const script = `${routine.name}. ${routine.purpose}. Let's begin. ` + 
+            detailedInstructions.map((step, i) => `Step ${i + 1}: ${step.text}`).join(". ");
+          
+          const url = await audioService.generateVoiceover(
+            script, 
+            apiKeyState.elevenLabsKey, 
+            audioSettings.selectedVoiceId
+          );
+          
+          setVoiceoverUrl(url);
+        } catch (error) {
+          console.error('Failed to generate voiceover:', error);
+          toast({
+            title: "Voiceover Generation Failed",
+            description: "Using text-only instructions instead.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    generateVoiceover();
+  }, [routine, apiKeyState, audioSettings, detailedInstructions]);
 
   useEffect(() => {
     // Initialize
@@ -88,8 +127,39 @@ const RoutinePlayer: React.FC<RoutinePlayerProps> = ({
     return () => clearInterval(timer);
   }, [currentStep, isPaused, isCompleted, isPreparation, detailedInstructions]);
 
+  // Start playing audio when the routine begins
+  useEffect(() => {
+    if (!isPreparation && voiceoverUrl && !isPaused && !isCompleted) {
+      audioService.playRoutineAudio(voiceoverUrl);
+    }
+    
+    return () => {
+      if (isCompleted || isPreparation) {
+        audioService.stop();
+      }
+    };
+  }, [isPreparation, voiceoverUrl, isPaused, isCompleted]);
+  
+  // Handle pausing and resuming audio
+  useEffect(() => {
+    if (isPaused) {
+      audioService.pause();
+    } else if (!isPreparation && !isCompleted) {
+      audioService.resume();
+    }
+  }, [isPaused, isPreparation, isCompleted]);
+
   const togglePause = () => {
     setIsPaused(prev => !prev);
+  };
+
+  const toggleMute = () => {
+    setIsAudioMuted(prev => !prev);
+    audioService.updateSettings({
+      ...audioSettings,
+      voiceoverEnabled: !isAudioMuted,
+      ambienceEnabled: !isAudioMuted
+    });
   };
 
   const skipToNextStep = () => {
@@ -107,8 +177,8 @@ const RoutinePlayer: React.FC<RoutinePlayerProps> = ({
   };
 
   const playCompletionSound = () => {
-    // In a real app, you would have proper sound files and implementation
-    // This is a placeholder for now
+    audioService.stop();
+    // Play a completion sound
     if (audioRef.current) {
       audioRef.current.play().catch(e => console.error("Error playing sound:", e));
     }
@@ -153,7 +223,7 @@ const RoutinePlayer: React.FC<RoutinePlayerProps> = ({
   return (
     <div className="flex flex-col min-h-screen bg-[#121212] text-[#F5F5F5] p-6">
       {/* Audio element for sound effects */}
-      <audio ref={audioRef} src="/path-to-sound.mp3" />
+      <audio ref={audioRef} src="https://cdn.pixabay.com/download/audio/2021/08/09/audio_7b6a598726.mp3" />
       
       <div className="flex items-center mb-6">
         <button 
@@ -276,6 +346,13 @@ const RoutinePlayer: React.FC<RoutinePlayerProps> = ({
             </svg>
           </div>
 
+          {/* Audio availability status */}
+          {!voiceoverUrl && apiKeyState.elevenLabsKeyValidated && audioSettings.voiceoverEnabled && (
+            <div className="mb-4 text-center text-sm text-[#D8C5A3]">
+              Generating audio guidance...
+            </div>
+          )}
+
           {/* Current step */}
           <div className="text-center mb-8 w-full max-w-md">
             <p className="text-[#D8C5A3] uppercase text-sm tracking-wide mb-2">
@@ -310,6 +387,16 @@ const RoutinePlayer: React.FC<RoutinePlayerProps> = ({
               className="w-12 h-12 rounded-full bg-[#2A2A2A] flex items-center justify-center hover:bg-[#004F2D] transition-colors"
             >
               <SkipForward className="w-6 h-6 text-[#F5F5F5]" />
+            </button>
+            <button
+              onClick={toggleMute}
+              className="w-12 h-12 rounded-full bg-[#2A2A2A] flex items-center justify-center hover:bg-[#004F2D] transition-colors"
+            >
+              {isAudioMuted ? (
+                <VolumeX className="w-6 h-6 text-[#F5F5F5]" />
+              ) : (
+                <Volume2 className="w-6 h-6 text-[#F5F5F5]" />
+              )}
             </button>
           </div>
 

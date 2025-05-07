@@ -1,3 +1,4 @@
+
 import { AudioSettings } from "@/types";
 
 class AudioService {
@@ -59,9 +60,9 @@ class AudioService {
   getAmbienceUrl(style: string): string {
     switch (style) {
       case 'zen-rain':
-        return 'https://example.com/zen-rain.mp3'; // Replace with actual URL
+        return 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_41ac3ecc3d.mp3'; // Real rain ambient sound
       case 'calm-ocean':
-        return 'https://example.com/calm-ocean.mp3'; // Replace with actual URL
+        return 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d1060e648f.mp3'; // Real ocean waves sound
       default:
         return '';
     }
