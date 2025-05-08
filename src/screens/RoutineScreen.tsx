@@ -4,6 +4,9 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-na
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../App.native';
+import DichotomyCutInput from '../components/DichotomyCutInput';
+import DichotomyCutResults from '../components/DichotomyCutResults';
+import { DichotomyCutAnalysis } from '../services/openAiService';
 
 type RoutineScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Routine'>;
 type RoutineScreenRouteProp = RouteProp<RootStackParamList, 'Routine'>;
@@ -14,14 +17,31 @@ const RoutineScreen = () => {
   const { routineId } = route.params;
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
-
+  const [showDichotomyCutInput, setShowDichotomyCutInput] = useState(false);
+  const [showDichotomyCutResults, setShowDichotomyCutResults] = useState(false);
+  const [analysis, setAnalysis] = useState<DichotomyCutAnalysis | null>(null);
+  
+  // Sample OpenAI API key - in a real app, this should be securely fetched
+  const [apiKey, setApiKey] = useState('');
+  
   // Sample routine data - in a real app, this would be fetched based on routineId
   const routine = {
     id: routineId,
-    title: 'Focus Boost',
+    title: routineId === 'dichotomy-cut' ? 'The Dichotomy Cut' : 'Focus Boost',
     duration: 60, // seconds
-    instructions: 'Begin by taking a deep breath in through your nose. Hold for 4 seconds. Now exhale slowly through your mouth. Continue this breathing pattern while focusing on a single point.'
+    instructions: routineId === 'dichotomy-cut' 
+      ? 'Split your concerns into "In Your Control" vs "Not In Your Control", then choose to act on 1 you can control'
+      : 'Begin by taking a deep breath in through your nose. Hold for 4 seconds. Now exhale slowly through your mouth. Continue this breathing pattern while focusing on a single point.'
   };
+
+  useEffect(() => {
+    // If this is the dichotomy-cut routine, show the input form after a brief delay
+    if (routineId === 'dichotomy-cut') {
+      setTimeout(() => {
+        setShowDichotomyCutInput(true);
+      }, 500);
+    }
+  }, [routineId]);
 
   useEffect(() => {
     let timer;
@@ -49,6 +69,22 @@ const RoutineScreen = () => {
   };
 
   const progressPercent = (timeElapsed / routine.duration) * 100;
+  
+  const handleAnalysisComplete = (analysisResult: DichotomyCutAnalysis) => {
+    setAnalysis(analysisResult);
+    setShowDichotomyCutInput(false);
+    setShowDichotomyCutResults(true);
+  };
+  
+  const handleSkipAnalysis = () => {
+    setShowDichotomyCutInput(false);
+    setIsPlaying(true);
+  };
+  
+  const handleContinueFromResults = () => {
+    setShowDichotomyCutResults(false);
+    setIsPlaying(true);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -62,47 +98,67 @@ const RoutineScreen = () => {
         <Text style={styles.title}>{routine.title}</Text>
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.timerContainer}>
-          <View style={styles.progressRing}>
-            <Text style={styles.timerText}>{formatTime(timeElapsed)}</Text>
+      {/* Dichotomy Cut Input Form */}
+      <DichotomyCutInput 
+        apiKey={apiKey}
+        onAnalysisComplete={handleAnalysisComplete}
+        onSkip={handleSkipAnalysis}
+        isVisible={showDichotomyCutInput}
+      />
+      
+      {/* Dichotomy Cut Results */}
+      {analysis && (
+        <DichotomyCutResults
+          analysis={analysis}
+          onContinue={handleContinueFromResults}
+          isVisible={showDichotomyCutResults}
+        />
+      )}
+      
+      {/* Standard Routine UI - only shown when not in special modes */}
+      {!showDichotomyCutInput && !showDichotomyCutResults && (
+        <View style={styles.content}>
+          <View style={styles.timerContainer}>
+            <View style={styles.progressRing}>
+              <Text style={styles.timerText}>{formatTime(timeElapsed)}</Text>
+            </View>
+          </View>
+
+          <View style={styles.progressBar}>
+            <View 
+              style={[
+                styles.progressFill,
+                { width: `${progressPercent}%` }
+              ]} 
+            />
+          </View>
+
+          <View style={styles.instructionsContainer}>
+            <Text style={styles.instructionsTitle}>Instructions</Text>
+            <Text style={styles.instructionsText}>{routine.instructions}</Text>
+          </View>
+
+          <View style={styles.controls}>
+            <TouchableOpacity 
+              style={styles.controlButton}
+              onPress={resetRoutine}
+            >
+              <Text style={styles.controlIcon}>↺</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.controlButton, styles.playButton]}
+              onPress={togglePlayPause}
+            >
+              <Text style={styles.playIcon}>{isPlaying ? '❙❙' : '▶'}</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.controlButton}>
+              <Text style={styles.controlIcon}>⏭</Text>
+            </TouchableOpacity>
           </View>
         </View>
-
-        <View style={styles.progressBar}>
-          <View 
-            style={[
-              styles.progressFill,
-              { width: `${progressPercent}%` }
-            ]} 
-          />
-        </View>
-
-        <View style={styles.instructionsContainer}>
-          <Text style={styles.instructionsTitle}>Instructions</Text>
-          <Text style={styles.instructionsText}>{routine.instructions}</Text>
-        </View>
-
-        <View style={styles.controls}>
-          <TouchableOpacity 
-            style={styles.controlButton}
-            onPress={resetRoutine}
-          >
-            <Text style={styles.controlIcon}>↺</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.controlButton, styles.playButton]}
-            onPress={togglePlayPause}
-          >
-            <Text style={styles.playIcon}>{isPlaying ? '❙❙' : '▶'}</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.controlButton}>
-            <Text style={styles.controlIcon}>⏭</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 };

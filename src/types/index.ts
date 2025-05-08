@@ -1,5 +1,4 @@
-
-export interface Routine {
+export type Routine = {
   id: string;
   name: string;
   purpose: string;
@@ -8,55 +7,32 @@ export interface Routine {
   science: string;
   iconName: string;
   tags: string[];
-  detailedInstructions?: InstructionStep[];
-}
+  detailedInstructions: InstructionStep[];
+};
 
-export interface InstructionStep {
+export type InstructionStep = {
   text: string;
   durationSeconds: number;
-}
+};
 
-export interface QuizState {
-  // Slider questions (1-10)
-  mentalClarity: number;
-  energyLevel: number;
-  stressLevel: number;
-  preferQuickRoutine: number;
-  needPhysicalRelaxation: number;
-  
-  // Yes/No questions
-  needFocus: boolean;
-  needVisualization: boolean;
-  needPhysicalActivation: boolean;
-  needEmotionalRegulation: boolean;
-  wantColdExposure: boolean;
-  needDistractionControl: boolean;
-}
+export type AudioSettings = {
+  voiceoverEnabled: boolean;
+  ambienceEnabled: boolean;
+  ambienceStyle: string;
+  volume: number;
+  selectedVoiceId: string | null;
+};
 
-export interface ApiKeyState {
+export type ApiKeyState = {
   openAiKey: string;
   elevenLabsKey: string;
   keyValidated: boolean;
   elevenLabsKeyValidated: boolean;
-}
+};
 
-export interface AudioSettings {
-  voiceoverEnabled: boolean;
-  ambienceEnabled: boolean;
-  selectedVoiceId: string;
-  ambienceStyle: "zen-rain" | "calm-ocean" | "none";
-  volume: number;
-}
-
-export interface ElevenLabsVoice {
-  voice_id: string;
-  name: string;
-  preview_url: string;
-}
-
-export interface RoutineFeedback {
-  routineId: string;
-  rating: number;
-  comment?: string;
-  timestamp: Date;
-}
+// Add type for OpenAI Dichotomy Cut analysis
+export type DichotomyCutAnalysis = {
+  controllable: string[];
+  uncontrollable: string[];
+  recommendation: string;
+};
