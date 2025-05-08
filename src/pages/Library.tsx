@@ -9,15 +9,59 @@ import RoutineCard from "@/components/RoutineCard";
 
 // Sample data - in a real app, this would come from context/API
 const routines = [
-  { id: '1', name: 'Focus Boost', duration: '1 min', purpose: 'Quick routine to boost focus and attention.' },
-  { id: '2', name: 'Calm Mind', duration: '2 min', purpose: 'Reduce anxiety and find your center.' },
-  { id: '3', name: 'Energy Lift', duration: '3 min', purpose: 'Combat fatigue and increase energy levels.' },
-  { id: 'dichotomy-cut', name: 'The Dichotomy Cut', duration: '2 min', purpose: 'Separate what you can control from what you cannot.' },
+  { 
+    id: '1', 
+    name: 'Focus Boost', 
+    duration: '1 min', 
+    purpose: 'Quick routine to boost focus and attention.',
+    steps: ['Take a deep breath', 'Focus on a single point', 'Clear your mind'],
+    science: 'Improves attention and concentration',
+    iconName: 'brain',
+    tags: ['focus', 'quick'],
+    detailedInstructions: []
+  },
+  { 
+    id: '2', 
+    name: 'Calm Mind', 
+    duration: '2 min', 
+    purpose: 'Reduce anxiety and find your center.',
+    steps: ['Sit comfortably', 'Close your eyes', 'Breathe deeply'],
+    science: 'Reduces cortisol levels',
+    iconName: 'smile',
+    tags: ['calm', 'stress-relief'],
+    detailedInstructions: []
+  },
+  { 
+    id: '3', 
+    name: 'Energy Lift', 
+    duration: '3 min', 
+    purpose: 'Combat fatigue and increase energy levels.',
+    steps: ['Stretch your arms', 'Take quick, energizing breaths', 'Move your body'],
+    science: 'Increases blood flow and oxygen levels',
+    iconName: 'zap',
+    tags: ['energy', 'morning'],
+    detailedInstructions: []
+  },
+  { 
+    id: 'dichotomy-cut', 
+    name: 'The Dichotomy Cut', 
+    duration: '2 min', 
+    purpose: 'Separate what you can control from what you cannot.',
+    steps: ['Identify your concerns', 'Classify as controllable or uncontrollable', 'Focus on controllable aspects'],
+    science: 'Improves decision making and reduces anxiety',
+    iconName: 'scissors',
+    tags: ['stoic', 'mindfulness'],
+    detailedInstructions: []
+  },
 ];
 
 const Library = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState("all");
+
+  const handleStartRoutine = (routineId: string) => {
+    navigate(`/routine?id=${routineId}`);
+  };
 
   return (
     <div className="min-h-screen bg-[#121212] text-[#F5F5F5] p-6">
@@ -111,11 +155,9 @@ const Library = () => {
           {routines.map((routine) => (
             <RoutineCard
               key={routine.id}
-              id={routine.id}
-              title={routine.name}
-              description={routine.purpose}
-              duration={routine.duration}
-              onClick={() => navigate(`/routine?id=${routine.id}`)}
+              routine={routine}
+              onStart={handleStartRoutine}
+              compact={true}
             />
           ))}
         </div>
