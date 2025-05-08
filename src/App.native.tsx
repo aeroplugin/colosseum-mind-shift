@@ -12,6 +12,7 @@ import QuizScreen from './screens/QuizScreen';
 import LibraryScreen from './screens/LibraryScreen';
 import RoutineScreen from './screens/RoutineScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import CognitiveGameScreen from './screens/CognitiveGameScreen';
 
 // Define types for the navigation stack
 export type RootStackParamList = {
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   Library: undefined;
   Routine: { routineId: string };
   Settings: undefined;
+  CognitiveGame: { gameType: 'dualNBack' | 'stroopTap' };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -44,6 +46,7 @@ const App = () => {
               <Stack.Screen name="Library" component={LibraryScreen} />
               <Stack.Screen name="Routine" component={RoutineScreen} />
               <Stack.Screen name="Settings" component={SettingsScreen} />
+              <Stack.Screen name="CognitiveGame" component={CognitiveGameScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaProvider>

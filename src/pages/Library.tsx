@@ -1,120 +1,125 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { routines } from "@/data/routines";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import PrimaryButton from "@/components/ui/PrimaryButton";
+import { ArrowLeft, Play, Brain, TimerIcon } from "lucide-react";
+import { Routine } from "@/types";
 import RoutineCard from "@/components/RoutineCard";
-import { useAppContext } from "@/context/AppContext";
-import { ArrowLeft, Search, Settings } from "lucide-react";
-import { Input } from "@/components/ui/input";
+
+// Sample data - in a real app, this would come from context/API
+const routines = [
+  { id: '1', name: 'Focus Boost', duration: '1 min', purpose: 'Quick routine to boost focus and attention.' },
+  { id: '2', name: 'Calm Mind', duration: '2 min', purpose: 'Reduce anxiety and find your center.' },
+  { id: '3', name: 'Energy Lift', duration: '3 min', purpose: 'Combat fatigue and increase energy levels.' },
+  { id: 'dichotomy-cut', name: 'The Dichotomy Cut', duration: '2 min', purpose: 'Separate what you can control from what you cannot.' },
+];
 
 const Library = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const { resetQuiz, setRecommendedRoutine } = useAppContext();
-
-  // Get unique tags from all routines
-  const tags = Array.from(
-    new Set(routines.flatMap(routine => routine.tags))
-  );
-
-  // Filter routines based on search term and selected tag
-  const filteredRoutines = routines.filter(routine => {
-    const matchesSearch = searchTerm === "" || 
-      routine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      routine.purpose.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    const matchesTag = selectedTag === null || routine.tags.includes(selectedTag);
-    
-    return matchesSearch && matchesTag;
-  });
-
-  const handleRoutineStart = (routineId: string) => {
-    const routine = routines.find(r => r.id === routineId);
-    if (routine) {
-      // Set the selected routine in the context before navigating
-      setRecommendedRoutine(routine);
-      navigate("/routine");
-    }
-  };
-
-  const handleBackClick = () => {
-    navigate(-1);
-  };
-
-  const toggleTag = (tag: string) => {
-    if (selectedTag === tag) {
-      setSelectedTag(null);
-    } else {
-      setSelectedTag(tag);
-    }
-  };
+  const [filter, setFilter] = useState("all");
 
   return (
     <div className="min-h-screen bg-[#121212] text-[#F5F5F5] p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center mb-8">
           <button 
-            onClick={handleBackClick}
+            onClick={() => navigate(-1)}
             className="text-[#D8C5A3] hover:text-[#F5F5F5] transition-colors"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-2xl font-trajan uppercase tracking-wide ml-4">Routine Library</h1>
-        </div>
-        <button
-          onClick={() => navigate("/settings")}
-          className="text-[#D8C5A3] hover:text-[#F5F5F5] transition-colors"
-          aria-label="Settings"
-        >
-          <Settings className="w-6 h-6" />
-        </button>
-      </div>
-
-      <div className="mb-6">
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-[#B3B3B3]" />
-          <Input
-            type="text"
-            placeholder="Search routines..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-[#1A1A1A] border-[#2A2A2A] text-[#F5F5F5] placeholder:text-[#B3B3B3] focus:border-[#D8C5A3]"
-          />
+          <h1 className="text-2xl font-semibold ml-4">Routine Library</h1>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {tags.map(tag => (
-            <button
-              key={tag}
-              onClick={() => toggleTag(tag)}
-              className={`px-3 py-1 rounded-full text-sm ${
-                selectedTag === tag
-                  ? "bg-[#004F2D] text-[#F5F5F5]"
-                  : "bg-[#2A2A2A] text-[#D8C5A3]"
-              } transition-colors`}
-            >
-              {tag}
-            </button>
+        <div className="flex flex-wrap gap-2 mb-6">
+          <button 
+            onClick={() => setFilter("all")}
+            className={`px-4 py-1 rounded-full ${filter === "all" 
+              ? "bg-[#004F2D] text-white" 
+              : "bg-[#1A1A1A] text-[#B3B3B3] hover:bg-[#2A2A2A]"}`}
+          >
+            All
+          </button>
+          <button 
+            onClick={() => setFilter("focus")}
+            className={`px-4 py-1 rounded-full ${filter === "focus" 
+              ? "bg-[#004F2D] text-white" 
+              : "bg-[#1A1A1A] text-[#B3B3B3] hover:bg-[#2A2A2A]"}`}
+          >
+            Focus
+          </button>
+          <button 
+            onClick={() => setFilter("calm")}
+            className={`px-4 py-1 rounded-full ${filter === "calm" 
+              ? "bg-[#004F2D] text-white" 
+              : "bg-[#1A1A1A] text-[#B3B3B3] hover:bg-[#2A2A2A]"}`}
+          >
+            Calm
+          </button>
+          <button 
+            onClick={() => setFilter("energy")}
+            className={`px-4 py-1 rounded-full ${filter === "energy" 
+              ? "bg-[#004F2D] text-white" 
+              : "bg-[#1A1A1A] text-[#B3B3B3] hover:bg-[#2A2A2A]"}`}
+          >
+            Energy
+          </button>
+        </div>
+        
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Cognitive Exercises</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="bg-[#1A1A1A] border-[#2A2A2A] hover:border-[#004F2D] cursor-pointer transition-all" onClick={() => navigate('/cognitive?type=dualNBack')}>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-[#D8C5A3]">
+                  <Brain className="mr-2 w-5 h-5" /> Dual N-Back Challenge
+                </CardTitle>
+                <CardDescription>60 seconds</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Enhance working memory and fluid intelligence with a quick memory challenge.</p>
+              </CardContent>
+              <CardFooter>
+                <div className="text-xs bg-[#004F2D]/20 text-[#D8C5A3] px-2 py-1 rounded-full">
+                  Working Memory
+                </div>
+              </CardFooter>
+            </Card>
+            
+            <Card className="bg-[#1A1A1A] border-[#2A2A2A] hover:border-[#004F2D] cursor-pointer transition-all" onClick={() => navigate('/cognitive?type=stroopTap')}>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-[#D8C5A3]">
+                  <TimerIcon className="mr-2 w-5 h-5" /> 1-Minute Focus Reset
+                </CardTitle>
+                <CardDescription>60 seconds</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Improve selective attention and executive function with a quick Stroop test.</p>
+              </CardContent>
+              <CardFooter>
+                <div className="text-xs bg-[#004F2D]/20 text-[#D8C5A3] px-2 py-1 rounded-full">
+                  Executive Function
+                </div>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+
+        <h2 className="text-xl font-semibold mb-4">Mindfulness Routines</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {routines.map((routine) => (
+            <RoutineCard
+              key={routine.id}
+              id={routine.id}
+              title={routine.name}
+              description={routine.purpose}
+              duration={routine.duration}
+              onClick={() => navigate(`/routine?id=${routine.id}`)}
+            />
           ))}
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredRoutines.map(routine => (
-          <RoutineCard
-            key={routine.id}
-            routine={routine}
-            onStart={handleRoutineStart}
-          />
-        ))}
-      </div>
-
-      {filteredRoutines.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-[#B3B3B3]">No routines found matching your search.</p>
-        </div>
-      )}
     </div>
   );
 };

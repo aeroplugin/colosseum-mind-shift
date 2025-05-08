@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../App.native';
@@ -12,6 +12,25 @@ const routines = [
   { id: '1', title: 'Focus Boost', duration: '1 min', description: 'Quick routine to boost focus and attention.' },
   { id: '2', title: 'Calm Mind', duration: '2 min', description: 'Reduce anxiety and find your center.' },
   { id: '3', title: 'Energy Lift', duration: '3 min', description: 'Combat fatigue and increase energy levels.' },
+];
+
+const cognitiveGames = [
+  { 
+    id: 'dual-n-back',
+    title: 'Dual N-Back Challenge',
+    duration: '1 min',
+    description: 'Enhance working memory and fluid intelligence.',
+    tag: 'Working Memory',
+    type: 'dualNBack'
+  },
+  {
+    id: 'stroop-tap',
+    title: '1-Minute Focus Reset',
+    duration: '1 min',
+    description: 'Improve selective attention and executive function.',
+    tag: 'Executive Function',
+    type: 'stroopTap'
+  }
 ];
 
 const LibraryScreen = () => {
@@ -27,6 +46,22 @@ const LibraryScreen = () => {
         <Text style={styles.routineDuration}>{item.duration}</Text>
       </View>
       <Text style={styles.routineDescription}>{item.description}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderCognitiveGameItem = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.routineCard}
+      onPress={() => navigation.navigate('CognitiveGame', { gameType: item.type })}
+    >
+      <View style={styles.cardHeader}>
+        <Text style={styles.routineTitle}>{item.title}</Text>
+        <Text style={styles.routineDuration}>{item.duration}</Text>
+      </View>
+      <Text style={styles.routineDescription}>{item.description}</Text>
+      <View style={styles.tagContainer}>
+        <Text style={styles.tagText}>{item.tag}</Text>
+      </View>
     </TouchableOpacity>
   );
 
@@ -48,20 +83,25 @@ const LibraryScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.content}>
-        <Text style={styles.heading}>Browse All Routines</Text>
-        <Text style={styles.paragraph}>
-          Select a routine from our library of science-backed mental exercises.
-        </Text>
+      <ScrollView style={styles.content}>
+        <Text style={styles.sectionTitle}>Cognitive Exercises</Text>
+        <FlatList
+          data={cognitiveGames}
+          renderItem={renderCognitiveGameItem}
+          keyExtractor={item => item.id}
+          style={styles.gamesList}
+          scrollEnabled={false}
+        />
         
+        <Text style={styles.sectionTitle}>Mindfulness Routines</Text>
         <FlatList
           data={routines}
           renderItem={renderRoutineItem}
           keyExtractor={item => item.id}
           style={styles.routineList}
-          contentContainerStyle={styles.routineListContent}
+          scrollEnabled={false}
         />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -103,6 +143,12 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 16,
+  },
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -116,11 +162,11 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     textAlign: 'center',
   },
-  routineList: {
-    flex: 1,
+  gamesList: {
+    marginBottom: 24,
   },
-  routineListContent: {
-    paddingBottom: 20,
+  routineList: {
+    marginBottom: 20,
   },
   routineCard: {
     backgroundColor: '#1A1A1A',
@@ -148,6 +194,18 @@ const styles = StyleSheet.create({
   routineDescription: {
     fontSize: 14,
     color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  tagContainer: {
+    backgroundColor: 'rgba(0, 79, 45, 0.2)',
+    borderRadius: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    alignSelf: 'flex-start',
+  },
+  tagText: {
+    color: '#D8C5A3',
+    fontSize: 12,
   },
 });
 

@@ -11,6 +11,7 @@ import RoutinePage from "./pages/RoutinePage";
 import Library from "./pages/Library";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import CognitiveGamePage from "./pages/CognitiveGamePage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/routine" element={<RoutinePage />} />
             <Route path="/library" element={<Library />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/cognitive" element={<CognitiveGamePage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
