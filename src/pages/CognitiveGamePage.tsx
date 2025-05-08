@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CognitiveGameType } from "@/types";
@@ -7,6 +8,7 @@ import { toast } from "@/components/ui/use-toast";
 const CognitiveGamePage = () => {
   const navigate = useNavigate();
   const [selectedGameType, setSelectedGameType] = useState<CognitiveGameType | null>(null);
+  const [showResults, setShowResults] = useState<boolean>(false);
 
   // Get the game type from URL parameters
   const searchParams = new URLSearchParams(window.location.search);
@@ -19,11 +21,13 @@ const CognitiveGamePage = () => {
 
   const handleGameSelect = (gameType: CognitiveGameType) => {
     setSelectedGameType(gameType);
+    setShowResults(false);
     // Update URL without refreshing the page
     window.history.replaceState(null, '', `?type=${gameType}`);
   };
 
   const handleGameComplete = () => {
+    setShowResults(true);
     toast({
       title: "Great job!",
       description: "You've completed the cognitive exercise.",
@@ -31,8 +35,15 @@ const CognitiveGamePage = () => {
     });
   };
 
+  const handlePlayAgain = () => {
+    setShowResults(false);
+  };
+
   const handleBack = () => {
-    if (selectedGameType) {
+    if (selectedGameType && showResults) {
+      // Go back to game if showing results
+      setShowResults(false);
+    } else if (selectedGameType) {
       // Go back to selection if a game is selected
       setSelectedGameType(null);
       window.history.replaceState(null, '', '/cognitive');
@@ -48,6 +59,8 @@ const CognitiveGamePage = () => {
         gameType={selectedGameType}
         onComplete={handleGameComplete}
         onBack={handleBack}
+        onPlayAgain={handlePlayAgain}
+        showResults={showResults}
       />
     );
   }
