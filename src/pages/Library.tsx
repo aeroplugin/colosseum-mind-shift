@@ -4,56 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import { ArrowLeft, Play, Brain, TimerIcon } from "lucide-react";
-import { Routine } from "@/types";
+import { routines } from "@/data/routines";
 import RoutineCard from "@/components/RoutineCard";
-
-// Sample data - in a real app, this would come from context/API
-const routines = [
-  { 
-    id: '1', 
-    name: 'Focus Boost', 
-    duration: '1 min', 
-    purpose: 'Quick routine to boost focus and attention.',
-    steps: ['Take a deep breath', 'Focus on a single point', 'Clear your mind'],
-    science: 'Improves attention and concentration',
-    iconName: 'brain',
-    tags: ['focus', 'quick'],
-    detailedInstructions: []
-  },
-  { 
-    id: '2', 
-    name: 'Calm Mind', 
-    duration: '2 min', 
-    purpose: 'Reduce anxiety and find your center.',
-    steps: ['Sit comfortably', 'Close your eyes', 'Breathe deeply'],
-    science: 'Reduces cortisol levels',
-    iconName: 'smile',
-    tags: ['calm', 'stress-relief'],
-    detailedInstructions: []
-  },
-  { 
-    id: '3', 
-    name: 'Energy Lift', 
-    duration: '3 min', 
-    purpose: 'Combat fatigue and increase energy levels.',
-    steps: ['Stretch your arms', 'Take quick, energizing breaths', 'Move your body'],
-    science: 'Increases blood flow and oxygen levels',
-    iconName: 'zap',
-    tags: ['energy', 'morning'],
-    detailedInstructions: []
-  },
-  { 
-    id: 'dichotomy-cut', 
-    name: 'The Dichotomy Cut', 
-    duration: '2 min', 
-    purpose: 'Separate what you can control from what you cannot.',
-    steps: ['Identify your concerns', 'Classify as controllable or uncontrollable', 'Focus on controllable aspects'],
-    science: 'Improves decision making and reduces anxiety',
-    iconName: 'scissors',
-    tags: ['stoic', 'mindfulness'],
-    detailedInstructions: []
-  },
-];
 
 const Library = () => {
   const navigate = useNavigate();
@@ -62,6 +14,11 @@ const Library = () => {
   const handleStartRoutine = (routineId: string) => {
     navigate(`/routine?id=${routineId}`);
   };
+
+  // Filter routines based on selected filter
+  const filteredRoutines = filter === "all" 
+    ? routines 
+    : routines.filter(routine => routine.tags.includes(filter));
 
   return (
     <div className="min-h-screen bg-[#121212] text-[#F5F5F5] p-6">
@@ -92,6 +49,14 @@ const Library = () => {
               : "bg-[#1A1A1A] text-[#B3B3B3] hover:bg-[#2A2A2A]"}`}
           >
             Focus
+          </button>
+          <button 
+            onClick={() => setFilter("clarity")}
+            className={`px-4 py-1 rounded-full ${filter === "clarity" 
+              ? "bg-[#004F2D] text-white" 
+              : "bg-[#1A1A1A] text-[#B3B3B3] hover:bg-[#2A2A2A]"}`}
+          >
+            Clarity
           </button>
           <button 
             onClick={() => setFilter("calm")}
@@ -152,7 +117,7 @@ const Library = () => {
 
         <h2 className="text-xl font-semibold mb-4">Mindfulness Routines</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {routines.map((routine) => (
+          {filteredRoutines.map((routine) => (
             <RoutineCard
               key={routine.id}
               routine={routine}

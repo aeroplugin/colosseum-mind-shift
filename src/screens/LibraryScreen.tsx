@@ -1,19 +1,13 @@
-
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../App.native';
+import { routines } from '../data/routines';
 
 type LibraryScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Library'>;
 
-// Sample data - in a real app, this would come from context/API
-const routines = [
-  { id: '1', title: 'Focus Boost', duration: '1 min', description: 'Quick routine to boost focus and attention.' },
-  { id: '2', title: 'Calm Mind', duration: '2 min', description: 'Reduce anxiety and find your center.' },
-  { id: '3', title: 'Energy Lift', duration: '3 min', description: 'Combat fatigue and increase energy levels.' },
-];
-
+// Sample data for cognitive games - in a real app, this would come from context/API
 const cognitiveGames = [
   { 
     id: 'dual-n-back',
@@ -42,10 +36,17 @@ const LibraryScreen = () => {
       onPress={() => navigation.navigate('Routine', { routineId: item.id })}
     >
       <View style={styles.cardHeader}>
-        <Text style={styles.routineTitle}>{item.title}</Text>
+        <Text style={styles.routineTitle}>{item.name}</Text>
         <Text style={styles.routineDuration}>{item.duration}</Text>
       </View>
-      <Text style={styles.routineDescription}>{item.description}</Text>
+      <Text style={styles.routineDescription}>{item.purpose}</Text>
+      <View style={styles.tagsContainer}>
+        {item.tags.map((tag, index) => (
+          <View key={index} style={styles.tagContainer}>
+            <Text style={styles.tagText}>{tag}</Text>
+          </View>
+        ))}
+      </View>
     </TouchableOpacity>
   );
 
@@ -206,6 +207,11 @@ const styles = StyleSheet.create({
   tagText: {
     color: '#D8C5A3',
     fontSize: 12,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
   },
 });
 
