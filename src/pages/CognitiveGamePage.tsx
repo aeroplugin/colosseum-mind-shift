@@ -15,7 +15,7 @@ const CognitiveGamePage = () => {
   const gameTypeParam = searchParams.get('type') as CognitiveGameType;
 
   // Set the game type from URL if not already set
-  if (!selectedGameType && (gameTypeParam === 'dualNBack' || gameTypeParam === 'stroopTap')) {
+  if (!selectedGameType && (gameTypeParam === 'dualNBack' || gameTypeParam === 'stroopTap' || gameTypeParam === 'cognitiveSwitch')) {
     setSelectedGameType(gameTypeParam);
   }
 
@@ -85,7 +85,7 @@ const CognitiveGamePage = () => {
           These short, science-backed cognitive challenges improve mental performance. Choose one to begin:
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Dual N-Back Card */}
           <div 
             className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 hover:border-[#004F2D] cursor-pointer transition-all"
@@ -113,6 +113,21 @@ const CognitiveGamePage = () => {
             </p>
             <div className="text-sm bg-[#004F2D]/20 text-[#D8C5A3] px-3 py-1 rounded-full inline-block">
               Executive Function
+            </div>
+          </div>
+          
+          {/* Cognitive Switch Card */}
+          <div 
+            className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 hover:border-[#004F2D] cursor-pointer transition-all"
+            onClick={() => handleGameSelect('cognitiveSwitch')}
+          >
+            <h2 className="text-xl font-semibold text-[#D8C5A3] mb-2">1-Minute Cognitive Switch</h2>
+            <div className="text-sm text-[#B3B3B3] mb-4">60 seconds</div>
+            <p className="mb-4">
+              Enhances cognitive flexibility by rapidly switching between different mental tasks every 15 seconds.
+            </p>
+            <div className="text-sm bg-[#004F2D]/20 text-[#D8C5A3] px-3 py-1 rounded-full inline-block">
+              Cognitive Flexibility
             </div>
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 export type Routine = {
   id: string;
   name: string;
@@ -102,12 +101,44 @@ export type StroopItem = {
   isMatch: boolean;
 };
 
-export type CognitiveGameType = 'dualNBack' | 'stroopTap';
+// Add type for Cognitive Switch game scores
+export type CognitiveSwitchScore = {
+  mathTap: {
+    correct: number;
+    incorrect: number;
+    total: number;
+    averageReactionTime: number;
+  };
+  colorWordTap: {
+    correct: number;
+    incorrect: number;
+    total: number;
+    averageReactionTime: number;
+  };
+  shapeCount: {
+    correct: number;
+    incorrect: number;
+    total: number;
+    averageReactionTime: number;
+  };
+  oddEvenSwitch: {
+    correct: number;
+    incorrect: number;
+    total: number;
+    averageReactionTime: number;
+  };
+  totalCorrect: number;
+  totalQuestions: number;
+  overallAccuracy: number;
+  averageReactionTime: number;
+};
+
+export type CognitiveGameType = 'dualNBack' | 'stroopTap' | 'cognitiveSwitch';
 
 export type CognitiveGameState = {
   isActive: boolean;
   isPaused: boolean;
   timeRemaining: number;
-  score: DualNBackScore | StroopTapScore;
+  score: DualNBackScore | StroopTapScore | CognitiveSwitchScore;
   gameType: CognitiveGameType;
 };

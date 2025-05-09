@@ -1,9 +1,10 @@
 
 import React, { useState } from "react";
-import { CognitiveGameType, DualNBackScore, StroopTapScore } from "@/types";
+import { CognitiveGameType, DualNBackScore, StroopTapScore, CognitiveSwitchScore } from "@/types";
 import { Card } from "@/components/ui/card";
 import DualNBackGame from "./DualNBackGame";
 import StroopTapGame from "./StroopTapGame";
+import CognitiveSwitch from "./CognitiveSwitch";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,6 +25,7 @@ export default function CognitiveGameController({
 }: CognitiveGameControllerProps) {
   const [dualNBackScore, setDualNBackScore] = useState<DualNBackScore | null>(null);
   const [stroopTapScore, setStroopTapScore] = useState<StroopTapScore | null>(null);
+  const [cognitiveSwitchScore, setCognitiveSwitchScore] = useState<CognitiveSwitchScore | null>(null);
 
   const handleDualNBackComplete = (score: DualNBackScore) => {
     setDualNBackScore(score);
@@ -32,6 +34,11 @@ export default function CognitiveGameController({
 
   const handleStroopTapComplete = (score: StroopTapScore) => {
     setStroopTapScore(score);
+    onComplete();
+  };
+
+  const handleCognitiveSwitchComplete = (score: CognitiveSwitchScore) => {
+    setCognitiveSwitchScore(score);
     onComplete();
   };
 
@@ -47,7 +54,9 @@ export default function CognitiveGameController({
             <ArrowLeft className="w-6 h-6" />
           </button>
           <h1 className="text-[#F5F5F5] text-xl ml-4">
-            {gameType === 'dualNBack' ? 'Dual N-Back Results' : 'Focus Reset Results'}
+            {gameType === 'dualNBack' ? 'Dual N-Back Results' : 
+             gameType === 'stroopTap' ? 'Focus Reset Results' :
+             'Cognitive Switch Results'}
           </h1>
         </div>
 
@@ -67,6 +76,21 @@ export default function CognitiveGameController({
               <p>Accuracy: {Math.round(stroopTapScore.accuracy * 100)}%</p>
               <p>Response Time: {Math.round(stroopTapScore.averageReactionTime)} ms</p>
               <p>Correct Taps: {stroopTapScore.correctTaps} of {stroopTapScore.totalTrials}</p>
+            </div>
+          )}
+          
+          {gameType === 'cognitiveSwitch' && cognitiveSwitchScore && (
+            <div className="space-y-2 mb-6">
+              <p>Overall Accuracy: {Math.round(cognitiveSwitchScore.overallAccuracy * 100)}%</p>
+              <p>Average Response Time: {Math.round(cognitiveSwitchScore.averageReactionTime)} ms</p>
+              <p>Correct Answers: {cognitiveSwitchScore.totalCorrect} of {cognitiveSwitchScore.totalQuestions}</p>
+              <div className="mt-4 pt-2 border-t border-[#2A2A2A]">
+                <p className="text-sm text-[#D8C5A3] mb-1">Task Breakdown:</p>
+                <p className="text-sm">Math Tap: {cognitiveSwitchScore.mathTap.correct} of {cognitiveSwitchScore.mathTap.total} correct</p>
+                <p className="text-sm">Color Word: {cognitiveSwitchScore.colorWordTap.correct} of {cognitiveSwitchScore.colorWordTap.total} correct</p>
+                <p className="text-sm">Shape Count: {cognitiveSwitchScore.shapeCount.correct} of {cognitiveSwitchScore.shapeCount.total} correct</p>
+                <p className="text-sm">Odd/Even: {cognitiveSwitchScore.oddEvenSwitch.correct} of {cognitiveSwitchScore.oddEvenSwitch.total} correct</p>
+              </div>
             </div>
           )}
           
@@ -101,14 +125,18 @@ export default function CognitiveGameController({
           <ArrowLeft className="w-6 h-6" />
         </button>
         <h1 className="text-[#F5F5F5] text-xl ml-4">
-          {gameType === 'dualNBack' ? 'Dual N-Back Challenge' : '1-Minute Focus Reset'}
+          {gameType === 'dualNBack' ? 'Dual N-Back Challenge' : 
+           gameType === 'stroopTap' ? '1-Minute Focus Reset' :
+           '1-Minute Cognitive Switch'}
         </h1>
       </div>
 
       {gameType === 'dualNBack' ? (
         <DualNBackGame onComplete={handleDualNBackComplete} />
-      ) : (
+      ) : gameType === 'stroopTap' ? (
         <StroopTapGame onComplete={handleStroopTapComplete} />
+      ) : (
+        <CognitiveSwitch onComplete={handleCognitiveSwitchComplete} />
       )}
     </div>
   );

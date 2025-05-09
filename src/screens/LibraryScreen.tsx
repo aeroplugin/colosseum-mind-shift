@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -24,6 +25,14 @@ const cognitiveGames = [
     description: 'Improve selective attention and executive function.',
     tag: 'Executive Function',
     type: 'stroopTap'
+  },
+  {
+    id: 'cognitive-switch',
+    title: '1-Minute Cognitive Switch',
+    duration: '1 min',
+    description: 'Enhance cognitive flexibility with rapid task switching.',
+    tag: 'Cognitive Flexibility',
+    type: 'cognitiveSwitch'
   }
 ];
 

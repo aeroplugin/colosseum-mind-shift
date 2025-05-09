@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import PrimaryButton from "@/components/ui/PrimaryButton";
-import { ArrowLeft, Play, Brain, TimerIcon } from "lucide-react";
+import { ArrowLeft, Play, Brain, TimerIcon, RotateCw } from "lucide-react";
 import { routines } from "@/data/routines";
 import RoutineCard from "@/components/RoutineCard";
 
@@ -78,7 +78,7 @@ const Library = () => {
         
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Cognitive Exercises</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card className="bg-[#1A1A1A] border-[#2A2A2A] hover:border-[#004F2D] cursor-pointer transition-all" onClick={() => navigate('/cognitive?type=dualNBack')}>
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center text-[#D8C5A3]">
@@ -109,6 +109,23 @@ const Library = () => {
               <CardFooter>
                 <div className="text-xs bg-[#004F2D]/20 text-[#D8C5A3] px-2 py-1 rounded-full">
                   Executive Function
+                </div>
+              </CardFooter>
+            </Card>
+            
+            <Card className="bg-[#1A1A1A] border-[#2A2A2A] hover:border-[#004F2D] cursor-pointer transition-all" onClick={() => navigate('/cognitive?type=cognitiveSwitch')}>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-[#D8C5A3]">
+                  <RotateCw className="mr-2 w-5 h-5" /> 1-Minute Cognitive Switch
+                </CardTitle>
+                <CardDescription>60 seconds</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Enhance cognitive flexibility by rapidly switching between different mental tasks.</p>
+              </CardContent>
+              <CardFooter>
+                <div className="text-xs bg-[#004F2D]/20 text-[#D8C5A3] px-2 py-1 rounded-full">
+                  Cognitive Flexibility
                 </div>
               </CardFooter>
             </Card>
