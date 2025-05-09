@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -7,6 +6,7 @@ import { RootStackParamList } from '../App.native';
 import DichotomyCutInput from '../components/DichotomyCutInput';
 import DichotomyCutResults from '../components/DichotomyCutResults';
 import { DichotomyCutAnalysis } from '../services/openAiService';
+import { routines } from '../data/routines';
 
 type RoutineScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Routine'>;
 type RoutineScreenRouteProp = RouteProp<RootStackParamList, 'Routine'>;
@@ -24,8 +24,8 @@ const RoutineScreen = () => {
   // Sample OpenAI API key - in a real app, this should be securely fetched
   const [apiKey, setApiKey] = useState('');
   
-  // Sample routine data - in a real app, this would be fetched based on routineId
-  const routine = {
+  // Find the routine data from the routines array
+  const routine = routines.find(r => r.id === routineId) || {
     id: routineId,
     title: routineId === 'dichotomy-cut' ? 'The Dichotomy Cut' : 'Focus Boost',
     duration: 60, // seconds
@@ -95,7 +95,7 @@ const RoutineScreen = () => {
         >
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{routine.title}</Text>
+        <Text style={styles.title}>{routine.name || routine.title}</Text>
       </View>
 
       {/* Dichotomy Cut Input Form */}
