@@ -60,10 +60,6 @@ export default function DualNBackGame({ onComplete, settings = {} }: DualNBackGa
     overallAccuracy: 0
   });
 
-  // Refs for tracking if user has responded in current round
-  const hasRespondedVisual = useRef<boolean>(false);
-  const hasRespondedAudio = useRef<boolean>(false);
-
   // Get audio settings from context
   const { apiKeyState, audioSettings } = useAppContext();
 
@@ -128,7 +124,7 @@ export default function DualNBackGame({ onComplete, settings = {} }: DualNBackGa
         
         setShowVisualFeedback(true);
         setTimeout(() => setShowVisualFeedback(false), 500);
-      } else {
+      } else if (type === 'audio') {
         const wasAudioMatch = letterHistory.current[nBackIndex] === letterHistory.current[currentRound - 1];
         isCorrect = (wasAudioMatch && isMatch) || (!wasAudioMatch && !isMatch);
         
@@ -149,21 +145,12 @@ export default function DualNBackGame({ onComplete, settings = {} }: DualNBackGa
         setShowAudioFeedback(true);
         setTimeout(() => setShowAudioFeedback(false), 500);
       }
-    }
-    
-    // After user responds to both visual and audio questions or time is up, continue with the game
-    setAskingQuestion(false);
-    setCurrentPosition(-1); // Clear position during question phase
-    
-    // Start next round or end game if all rounds are completed
-    if (roundsCompleted >= 3) { // Completed all rounds (2-3 quick rounds)
-      endGame();
-    } else {
-      setTimeout(() => {
-        if (isActive && !isPaused) {
-          startNewRound();
-        }
-      }, 1000);
+      
+      // Track total trials
+      setScore(prev => ({
+        ...prev,
+        totalTrials: prev.totalTrials + 1
+      }));
     }
   };
 
@@ -181,10 +168,6 @@ export default function DualNBackGame({ onComplete, settings = {} }: DualNBackGa
     if (questionTimer.current) {
       clearTimeout(questionTimer.current);
     }
-
-    // Reset response flags
-    hasRespondedVisual.current = false;
-    hasRespondedAudio.current = false;
 
     // Generate new position and letter
     const newPosition = getRandomPosition();
@@ -225,27 +208,17 @@ export default function DualNBackGame({ onComplete, settings = {} }: DualNBackGa
     setCurrentRound(prev => prev + 1);
     
     // After 3-4 steps, ask if this matches the one from n back
-    if (currentRound >= 3 && !askingQuestion) { // After 3-4 steps (including initial steps)
-      // Schedule to show question after a short delay
+    if (currentRound >= gameSettings.nLevel + 2) { // After N+2 steps
+      // Schedule to show position/play sound for a moment
       roundTimer.current = setTimeout(() => {
+        // Hide position and show question
         setAskingQuestion(true);
-        setCurrentPosition(-1); // Clear grid during question phase
         
-        // Give user a few seconds to answer before moving on
-        questionTimer.current = setTimeout(() => {
-          if (askingQuestion) {
-            setAskingQuestion(false);
-            setRoundsCompleted(prev => prev + 1);
-            
-            // Start next round or end game
-            if (roundsCompleted >= 2) { // Completed all rounds
-              endGame();
-            } else {
-              startNewRound();
-            }
-          }
-        }, 5000); // 5 seconds to answer
-      }, 1000); // Show grid and play sound for 1 second
+        // Reset the question timer
+        if (questionTimer.current) {
+          clearTimeout(questionTimer.current);
+        }
+      }, 1000); // Show for 1 second
     } else {
       // Continue showing positions and playing sounds
       roundTimer.current = setTimeout(() => {
@@ -259,6 +232,26 @@ export default function DualNBackGame({ onComplete, settings = {} }: DualNBackGa
           }
         }, 1000);
       }, 1000); // Show for 1 second
+    }
+  };
+
+  // Handle proceeding to next round after answering questions
+  const proceedToNextRound = () => {
+    setAskingQuestion(false);
+    setCurrentPosition(-1); // Clear position during transition
+    
+    // Increment completed rounds
+    setRoundsCompleted(prev => prev + 1);
+    
+    // Start next round or end game if all rounds are completed
+    if (roundsCompleted >= 2) { // Completed 3 rounds (0, 1, 2)
+      endGame();
+    } else {
+      setTimeout(() => {
+        if (isActive && !isPaused) {
+          startNewRound();
+        }
+      }, 1000); // Brief pause before starting next round
     }
   };
 
@@ -376,24 +369,41 @@ export default function DualNBackGame({ onComplete, settings = {} }: DualNBackGa
           </div>
         ) : (
           <>
+            {/* Question Panel - Show when we're asking a question */}
             {askingQuestion ? (
               <div className="mb-8 flex flex-col items-center">
                 <h2 className="text-xl font-semibold mb-4 text-center">
-                  Did this match what appeared {gameSettings.nLevel} step{gameSettings.nLevel > 1 ? 's' : ''} ago?
+                  Did these match what appeared {gameSettings.nLevel} step{gameSettings.nLevel > 1 ? 's' : ''} ago?
                 </h2>
                 
                 <div className="mb-6 w-full">
                   <h3 className="text-lg font-medium mb-2 text-[#D8C5A3]">Visual Position</h3>
                   <div className="flex justify-between gap-4 w-full">
                     <Button 
-                      onClick={() => handleMatchAnswer('visual', true)}
-                      className="flex-1 py-3 bg-[#1A1A1A] hover:bg-[#004F2D]"
+                      onClick={() => {
+                        handleMatchAnswer('visual', true);
+                        
+                        // Check if both answers have been given
+                        if (showAudioFeedback) {
+                          setTimeout(proceedToNextRound, 500);
+                        }
+                      }}
+                      className={`flex-1 py-3 ${showVisualFeedback ? (visualFeedbackCorrect ? 'bg-green-600' : 'bg-red-600') : 'bg-[#1A1A1A] hover:bg-[#004F2D]'}`}
+                      disabled={showVisualFeedback}
                     >
                       Yes
                     </Button>
                     <Button 
-                      onClick={() => handleMatchAnswer('visual', false)}
-                      className="flex-1 py-3 bg-[#1A1A1A] hover:bg-[#004F2D]"
+                      onClick={() => {
+                        handleMatchAnswer('visual', false);
+                        
+                        // Check if both answers have been given
+                        if (showAudioFeedback) {
+                          setTimeout(proceedToNextRound, 500);
+                        }
+                      }}
+                      className={`flex-1 py-3 ${showVisualFeedback ? (visualFeedbackCorrect ? 'bg-red-600' : 'bg-green-600') : 'bg-[#1A1A1A] hover:bg-[#004F2D]'}`}
+                      disabled={showVisualFeedback}
                     >
                       No
                     </Button>
@@ -404,19 +414,45 @@ export default function DualNBackGame({ onComplete, settings = {} }: DualNBackGa
                   <h3 className="text-lg font-medium mb-2 text-[#D8C5A3]">Audio Letter</h3>
                   <div className="flex justify-between gap-4 w-full">
                     <Button 
-                      onClick={() => handleMatchAnswer('audio', true)}
-                      className="flex-1 py-3 bg-[#1A1A1A] hover:bg-[#004F2D]"
+                      onClick={() => {
+                        handleMatchAnswer('audio', true);
+                        
+                        // Check if both answers have been given
+                        if (showVisualFeedback) {
+                          setTimeout(proceedToNextRound, 500);
+                        }
+                      }}
+                      className={`flex-1 py-3 ${showAudioFeedback ? (audioFeedbackCorrect ? 'bg-green-600' : 'bg-red-600') : 'bg-[#1A1A1A] hover:bg-[#004F2D]'}`}
+                      disabled={showAudioFeedback}
                     >
                       Yes
                     </Button>
                     <Button 
-                      onClick={() => handleMatchAnswer('audio', false)}
-                      className="flex-1 py-3 bg-[#1A1A1A] hover:bg-[#004F2D]"
+                      onClick={() => {
+                        handleMatchAnswer('audio', false);
+                        
+                        // Check if both answers have been given
+                        if (showVisualFeedback) {
+                          setTimeout(proceedToNextRound, 500);
+                        }
+                      }}
+                      className={`flex-1 py-3 ${showAudioFeedback ? (audioFeedbackCorrect ? 'bg-red-600' : 'bg-green-600') : 'bg-[#1A1A1A] hover:bg-[#004F2D]'}`}
+                      disabled={showAudioFeedback}
                     >
                       No
                     </Button>
                   </div>
                 </div>
+                
+                {/* Next button - appears after both answers are given */}
+                {showVisualFeedback && showAudioFeedback && (
+                  <Button 
+                    onClick={proceedToNextRound}
+                    className="mt-4 bg-[#004F2D] hover:bg-[#006D3E]"
+                  >
+                    Next Round
+                  </Button>
+                )}
               </div>
             ) : (
               /* 3x3 Grid */
