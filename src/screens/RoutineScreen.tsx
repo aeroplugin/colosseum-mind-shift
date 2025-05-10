@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -13,11 +12,10 @@ import { Routine } from '../types';
 type RoutineScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Routine'>;
 type RoutineScreenRouteProp = RouteProp<RootStackParamList, 'Routine'>;
 
-// Define a local interface that combines properties from both routine types
+// Define a local interface for routine display that works with both our data types
 interface RoutineDisplay {
   id: string;
   name: string;
-  title?: string;
   duration: number;
   instructions: string;
 }
@@ -45,7 +43,7 @@ const RoutineScreen = () => {
         name: foundRoutine.name,
         duration: typeof foundRoutine.duration === 'string' 
           ? parseInt(foundRoutine.duration, 10) 
-          : 60,
+          : foundRoutine.duration as number,
         instructions: foundRoutine.detailedInstructions 
           ? foundRoutine.detailedInstructions.map(step => step.text).join('. ') 
           : 'Follow the routine instructions.'
@@ -53,7 +51,6 @@ const RoutineScreen = () => {
     : {
         id: routineId,
         name: routineId === 'dichotomy-cut' ? 'The Dichotomy Cut' : 'Focus Boost',
-        title: routineId === 'dichotomy-cut' ? 'The Dichotomy Cut' : 'Focus Boost',
         duration: 60, // seconds
         instructions: routineId === 'dichotomy-cut' 
           ? 'Split your concerns into "In Your Control" vs "Not In Your Control", then choose to act on 1 you can control'
@@ -70,7 +67,7 @@ const RoutineScreen = () => {
   }, [routineId]);
 
   useEffect(() => {
-    let timer;
+    let timer: NodeJS.Timeout | undefined;
     if (isPlaying && timeElapsed < routine.duration) {
       timer = setInterval(() => {
         setTimeElapsed(prev => prev + 1);
@@ -88,7 +85,7 @@ const RoutineScreen = () => {
     setTimeElapsed(0);
   };
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
