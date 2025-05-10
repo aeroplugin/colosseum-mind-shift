@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -7,9 +8,19 @@ import DichotomyCutInput from '../components/DichotomyCutInput';
 import DichotomyCutResults from '../components/DichotomyCutResults';
 import { DichotomyCutAnalysis } from '../services/openAiService';
 import { routines } from '../data/routines';
+import { Routine } from '../types';
 
 type RoutineScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Routine'>;
 type RoutineScreenRouteProp = RouteProp<RootStackParamList, 'Routine'>;
+
+// Define a local interface that combines properties from both routine types
+interface RoutineDisplay {
+  id: string;
+  name: string;
+  title?: string;
+  duration: number;
+  instructions: string;
+}
 
 const RoutineScreen = () => {
   const navigation = useNavigation<RoutineScreenNavigationProp>();
@@ -24,15 +35,30 @@ const RoutineScreen = () => {
   // Sample OpenAI API key - in a real app, this should be securely fetched
   const [apiKey, setApiKey] = useState('');
   
-  // Find the routine data from the routines array
-  const routine = routines.find(r => r.id === routineId) || {
-    id: routineId,
-    title: routineId === 'dichotomy-cut' ? 'The Dichotomy Cut' : 'Focus Boost',
-    duration: 60, // seconds
-    instructions: routineId === 'dichotomy-cut' 
-      ? 'Split your concerns into "In Your Control" vs "Not In Your Control", then choose to act on 1 you can control'
-      : 'Begin by taking a deep breath in through your nose. Hold for 4 seconds. Now exhale slowly through your mouth. Continue this breathing pattern while focusing on a single point.'
-  };
+  // Find the routine data or use the fallback
+  const foundRoutine = routines.find(r => r.id === routineId);
+  
+  // Create a unified routine object that satisfies our interface
+  const routine: RoutineDisplay = foundRoutine 
+    ? {
+        id: foundRoutine.id,
+        name: foundRoutine.name,
+        duration: typeof foundRoutine.duration === 'string' 
+          ? parseInt(foundRoutine.duration, 10) 
+          : 60,
+        instructions: foundRoutine.detailedInstructions 
+          ? foundRoutine.detailedInstructions.map(step => step.text).join('. ') 
+          : 'Follow the routine instructions.'
+      }
+    : {
+        id: routineId,
+        name: routineId === 'dichotomy-cut' ? 'The Dichotomy Cut' : 'Focus Boost',
+        title: routineId === 'dichotomy-cut' ? 'The Dichotomy Cut' : 'Focus Boost',
+        duration: 60, // seconds
+        instructions: routineId === 'dichotomy-cut' 
+          ? 'Split your concerns into "In Your Control" vs "Not In Your Control", then choose to act on 1 you can control'
+          : 'Begin by taking a deep breath in through your nose. Hold for 4 seconds. Now exhale slowly through your mouth. Continue this breathing pattern while focusing on a single point.'
+      };
 
   useEffect(() => {
     // If this is the dichotomy-cut routine, show the input form after a brief delay
@@ -95,7 +121,7 @@ const RoutineScreen = () => {
         >
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{routine.name || routine.title}</Text>
+        <Text style={styles.title}>{routine.name}</Text>
       </View>
 
       {/* Dichotomy Cut Input Form */}
