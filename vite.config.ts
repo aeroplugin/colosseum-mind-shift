@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -17,6 +18,15 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "react-native": "react-native-web",
     },
+  },
+  define: {
+    // For react-native-web compatibility
+    __DEV__: JSON.stringify(mode !== 'production'),
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
   },
 }));
